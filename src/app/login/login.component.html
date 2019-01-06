@@ -1,0 +1,36 @@
+<div class="container">
+  <div class="login-form">
+    <div class="main-div">
+      <div class="panel">
+        <h2>Login</h2>
+        <p>Please enter your email and password</p>
+      </div>
+
+      <form (ngSubmit)="onSubmit(f)" #f="ngForm">
+        <div class="form-group">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" ngModel class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" ngModel class="form-control" required>
+          </div>
+
+          <div class="alert alert-danger" *ngIf="emailOrPasswordIncorrect">
+            Email or password is incorrect.
+          </div>
+
+          <p>
+            <button type="submit" class="btn btn-primary">Login</button>
+          </p>
+          <p>Or register a new user</p>
+          <p>
+            <button class="btn btn-primary" (click)="gotoRegister()">Register</button>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

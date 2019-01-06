@@ -1,0 +1,38 @@
+<div class="container">
+  <div class="login-form">
+    <div class="main-div">
+      <div class="panel">
+        <h2>Register</h2>
+        <p>Please enter your email and password</p>
+      </div>
+
+      <form (ngSubmit)="onSubmit(f)" #f="ngForm">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" name="email" id="email" ngModel class="form-control" required>
+          <div class="alert alert-danger" *ngIf="userExistMessage">
+            User already exists.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" name="password" id="password" ngModel class="form-control" minlength="6" #pw="ngModel" required>
+          <label for="password">Repeat Password</label>
+          <input type="password" name="rpassword" id="rpassword" ngModel class="form-control" #rpw="ngModel" required>
+          
+          <div class="alert alert-danger" *ngIf="f.invalid && (f.dirty || f.touched)">
+            <div *ngIf="pw.errors.minlength">
+              Password must be at least 6 characters
+            </div>
+            <div *ngIf="pw.value != rpw.value">
+              Password does not match
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="!f.form.valid">Register</button>
+      </form>
+    </div>
+  </div>
+</div>
