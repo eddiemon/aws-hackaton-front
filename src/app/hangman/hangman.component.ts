@@ -11,6 +11,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 export class HangmanComponent implements OnInit {
 
+  // guessCharUrl = 'https://l90psmonkb.execute-api.eu-north-1.amazonaws.com/dev/guess/char';
+  readonly initGameUrl = 'https://l90psmonkb.execute-api.eu-north-1.amazonaws.com/dev/init';
+
   userToken: any;
 
   figure1 = `  _______
@@ -42,6 +45,7 @@ export class HangmanComponent implements OnInit {
   ngOnInit() {
     const authedUser = this.auth.getAuthenticatedUser();
     if (authedUser == null) {
+      this.router.navigateByUrl('login');
       return;
     }
 
@@ -53,16 +57,22 @@ export class HangmanComponent implements OnInit {
 
       this.userToken = session.getIdToken().getJwtToken();
     });
+
+    this.initGame();
   }
 
-  getGames() {
-    const headers = new HttpHeaders();
-    headers.append('Authorization', this.userToken);
-    this.http.get('https://tmr0l960fe.execute-api.eu-central-1.amazonaws.com/default/hello-world', { headers: headers })
+  guessChar() {
+  }
+
+  initGame() {
+    const headers = new HttpHeaders()
+      .append('Authorization', this.userToken);
+
+    this.http.get(this.initGameUrl, { headers: headers })
       .subscribe(
-        (response: string) => {
-          // this.data = response;
-          console.log(response);
+        (response: any) => {
+          const jsonResp = JSON.parse(response.body);
+          console.log(jsonResp);
         },
         error => {
           console.log(error);
