@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
     if (!this.auth.isLoggedIn()) {
       this.router.navigateByUrl('login');
     } else {
-      this.router.navigateByUrl('hangman');
+      this.router.navigateByUrl('games');
     }
   }
 

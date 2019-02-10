@@ -7,15 +7,17 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { AuthorizationService } from './authorization.service';
-import { HangmanComponent } from './hangman/hangman.component';
 import { RegisterComponent } from './register/register.component';
+import { TictactoeComponent } from './tictactoe/tictactoe.component';
+import { GameLauncherComponent } from './game-launcher/game-launcher.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    HangmanComponent,
-    RegisterComponent
+    RegisterComponent,
+    TictactoeComponent,
+    GameLauncherComponent
   ],
   imports: [
     BrowserModule,

@@ -20,7 +20,7 @@ export class LoginComponent {
     const password = form.value.password;
 
     this.auth.signIn(email, password).subscribe((data) => {
-      this.router.navigateByUrl('/hangman');
+      this.router.navigateByUrl('/games');
     }, (err) => {
       this.emailOrPasswordIncorrect = true;
     });
