@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import {AuthenticationDetails, CognitoUser, CognitoUserPool} from 'amazon-cognito-identity-js';
+import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js';
 import { Observable } from 'rxjs/Observable';
 
 const poolData = {
-  UserPoolId: 'eu-central-1_to2TwuTuD', // hangman-users
-  ClientId: '761gcub62s15p5qtus1dee6tdg' // hangman-web
+  UserPoolId: process.env.USER_POOL_ID,
+  ClientId: process.env.USER_POOL_CLIENT_ID
 };
 
 const userPool = new CognitoUserPool(poolData);

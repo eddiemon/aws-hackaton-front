@@ -10,9 +10,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   styleUrls: ['./hangman.component.css']
 })
 export class HangmanComponent implements OnInit {
-
-  // guessCharUrl = 'https://l90psmonkb.execute-api.eu-north-1.amazonaws.com/dev/guess/char';
-  readonly initGameUrl = 'https://l90psmonkb.execute-api.eu-north-1.amazonaws.com/dev/init';
+  readonly apiEndpoint = process.env.API_END_POINT;
+  readonly initGameUrl = this.apiEndpoint + '/init';
 
   userToken: any;
 
