@@ -1,1 +1,9 @@
-<router-outlet></router-outlet>
+<div class="container page">
+    <h1 class="text-center">AWS hackaton!</h1>
+
+    <router-outlet></router-outlet>
+
+    <div class="text-center" *ngIf="isLoggedIn">
+        <button class="btn" (click)="signOut()">Logga ut</button>
+    </div>
+</div>

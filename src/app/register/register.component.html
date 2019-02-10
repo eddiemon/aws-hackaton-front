@@ -2,8 +2,8 @@
   <div class="login-form">
     <div class="main-div">
       <div class="panel">
-        <h2>Register</h2>
-        <p>Please enter your email and password</p>
+        <h2>Registrering</h2>
+        <p>Skriv in din email och ditt lösenord</p>
       </div>
 
       <form (ngSubmit)="onSubmit(f)" #f="ngForm">
@@ -11,27 +11,27 @@
           <label for="email">Email</label>
           <input type="email" name="email" id="email" ngModel class="form-control" required>
           <div class="alert alert-danger" *ngIf="userExistMessage">
-            User already exists.
+            Användaren existerar redan.
           </div>
         </div>
 
         <div class="form-group">
-          <label for="password">Password</label>
+          <label for="password">Lösenord</label>
           <input type="password" name="password" id="password" ngModel class="form-control" minlength="6" #pw="ngModel" required>
-          <label for="password">Repeat Password</label>
+          <label for="password">Repetera lösenord</label>
           <input type="password" name="rpassword" id="rpassword" ngModel class="form-control" #rpw="ngModel" required>
           
           <div class="alert alert-danger" *ngIf="f.invalid && (f.dirty || f.touched)">
             <div *ngIf="pw.errors.minlength">
-              Password must be at least 6 characters
+              Lösenordet måste vara minst 6 tecken långt
             </div>
             <div *ngIf="pw.value != rpw.value">
-              Password does not match
+              Lösenorden matchar inte
             </div>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary" [disabled]="!f.form.valid">Register</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!f.form.valid">Registrera</button>
       </form>
     </div>
   </div>

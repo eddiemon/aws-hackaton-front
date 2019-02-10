@@ -3,6 +3,7 @@ import { AuthorizationService } from '../authorization.service';
 import { Router } from '@angular/router';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-game',
@@ -10,7 +11,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   styleUrls: ['./hangman.component.css']
 })
 export class HangmanComponent implements OnInit {
-  readonly apiEndpoint = process.env.API_END_POINT;
+  readonly apiEndpoint = environment.API_ENDPOINT;
   readonly initGameUrl = this.apiEndpoint + '/init';
 
   userToken: any;
@@ -123,10 +124,4 @@ _|___`;
         }
       );
   }
-
-  signOut() {
-    this.auth.logOut();
-    this.router.navigateByUrl('login');
-  }
-
 }

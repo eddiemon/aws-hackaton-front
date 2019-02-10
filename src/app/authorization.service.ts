@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js';
 import { Observable } from 'rxjs/Observable';
+import { environment } from 'src/environments/environment';
 
 const poolData = {
-  UserPoolId: process.env.USER_POOL_ID,
-  ClientId: process.env.USER_POOL_CLIENT_ID
+  UserPoolId: environment.USER_POOL_ID,
+  ClientId: environment.USER_POOL_CLIENT_ID
 };
 
 const userPool = new CognitoUserPool(poolData);
