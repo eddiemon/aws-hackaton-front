@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 })
 export class AppComponent implements OnInit {
 
-  title = 'hangman';
+  title = 'AWS Hackaton';
 
   constructor(
     private auth: AuthorizationService,
