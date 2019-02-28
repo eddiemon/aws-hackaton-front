@@ -6,7 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
-import { AuthorizationService } from './authorization.service';
+import { SessionService } from './session.service';
 import { HangmanComponent } from './hangman/hangman.component';
 import { RegisterComponent } from './register/register.component';
 import { TictactoeComponent } from './tictactoe/tictactoe.component';
@@ -27,7 +27,7 @@ import { GameLauncherComponent } from './game-launcher/game-launcher.component';
     FormsModule,
     HttpClientModule
   ],
-  providers: [AuthorizationService],
+  providers: [SessionService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

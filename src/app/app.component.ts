@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthorizationService } from './authorization.service';
+// import { AuthorizationService } from './authorization.service';
+import { SessionService } from './session.service';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -14,9 +16,13 @@ export class AppComponent implements OnInit {
   isLoggedIn: boolean;
 
   constructor(
-    private auth: AuthorizationService,
+    private auth: SessionService,
     private router: Router) {
-      this.isLoggedIn = auth.isLoggedIn();
+      if (!environment.production) {
+        auth.signIn('eddie');
+      } else {
+        this.isLoggedIn = auth.isLoggedIn();
+      }
   }
 
   ngOnInit(): void {

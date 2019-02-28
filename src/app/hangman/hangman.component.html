@@ -1,8 +1,8 @@
 <div class="container">
   <div class="main-div">
-    <h1>Hangman</h1>
+    <h1>Hänga gubbe</h1>
     <div class="hangman">
-      {{ state }}
+      {{ printOut }}
     </div>
     <br />
     <div class="login-form">
@@ -10,11 +10,12 @@
         <div>
           <input type="text" class="form-control" name="guessChars" />
         </div>
-        <div>
-          <span><button class="btn" (click)="guessChar()">Guess char</button></span>
-          <span><button class="btn" (click)="guessWord()">Guess word</button></span>
-</div>
+        <div class="btn-group">
+          <button class="btn btn-primary" (click)="guessChar()">Gissa bokstav</button>
+          <button class="btn" (click)="guessWord()">Gissa ord</button>
+        </div>
       </form>
+      <a routerLink="/games"><button class="btn">Tillbaka till spel</button></a>
     </div>
   </div>
 </div>
