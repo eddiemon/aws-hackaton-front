@@ -15,7 +15,8 @@ export class HangmanComponent implements OnInit {
   readonly apiEndpoint = environment.API_ENDPOINT;
   readonly getGameStateApi = this.apiEndpoint + '/hangman-api/state';
   readonly playCharApi = this.apiEndpoint + '/hangman-api/playchar';
-  readonly playWordApi = this.apiEndpoint + '/hangman-api/playword';
+
+  readonly params = new HttpParams().append('username', this.auth.getAuthenticatedUser().getUsername());
 
 //#region Figures
 
@@ -113,9 +114,8 @@ _|___`;
   // State -1 is lost game
   // State 1-7 is according to the different figures
   private async getGameSession(): Promise<HangmanSession> {
-    const params = new HttpParams().append('username', this.auth.getAuthenticatedUser().getUsername());
 
-    const response = await this.http.get(this.getGameStateApi, { params }).toPromise();
+    const response = await this.http.get(this.getGameStateApi, { params: this.params }).toPromise();
 
     if (response === undefined ||
         response['statusCode'] !== 200 ||
