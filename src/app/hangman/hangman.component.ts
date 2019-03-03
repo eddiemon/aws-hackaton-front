@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { SessionService } from '../session.service';
 import { Router } from '@angular/router';
 
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { HangmanSession } from './hangman.session';
 
 @Component({
   selector: 'app-game',
@@ -83,7 +84,7 @@ _|___`;
 
 //#endregion
 
-  state = 1;
+  session: HangmanSession;
   printOut: string = this.figure1;
 
   constructor(
@@ -92,52 +93,57 @@ _|___`;
     private router: Router) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     const authedUser = this.auth.getAuthenticatedUser();
     if (authedUser == null) {
       this.router.navigateByUrl('login');
       return;
     }
 
-    this.getGameState();
+    await this.updateSession();
   }
 
   // Expect json of format
   // {
-  //   state: 1
+  //   state: 1,
+  //   guessedLetters: "string",
+  //   remainingGuesses: 7
   // }
   // State 0 is won game
   // State -1 is lost game
   // State 1-7 is according to the different figures
-  private getGameState() {
-    const httpParams = new HttpParams().set('userId', this.auth.getAuthenticatedUser().getUsername());
+  private async getGameSession(): Promise<HangmanSession> {
+    const params = new HttpParams().append('username', this.auth.getAuthenticatedUser().getUsername());
 
-    this.http.get(this.getGameStateApi, { params: httpParams })
-      .subscribe(
-        (response: any) => {
-          console.log(response);
+    const response = await this.http.get(this.getGameStateApi, { params }).toPromise();
 
-          if (response === undefined || response.body === undefined || response.body.state === undefined) {
-            console.log('Malformed response');
-            return;
-          }
+    if (response === undefined ||
+        response['statusCode'] !== 200 ||
+        response['body'] === undefined) {
+      console.log('Malformed response');
+      return null;
+    }
 
-          const jsonResp = JSON.parse(response.body);
-          console.log(jsonResp);
-        },
-        error => {
-          console.log(error);
-        }
-      );
+    const jsonResp = JSON.parse(response['body']);
+    return new HangmanSession(jsonResp.session.state, jsonResp.session.guessedLetters, jsonResp.session.remainingGuesses);
   }
 
-  private guessChar() {
-    this.state = (this.state + 1) % 8;
-    this.printOut = this.stateToPrintOut(this.state);
+  private async guessChar() {
+    await this.updateSession();
+  }
+
+  private async updateSession() {
+    this.session = await this.getGameSession();
+    if (this.session != null) {
+      this.printOut = this.stateToPrintOut(this.session.State);
+    } else {
+      this.printOut = 'Något gick fel';
+    }
   }
 
   private stateToPrintOut(state: number): string {
     switch (state) {
+      case -2: return 'Något gick fel..';
       case -1: return 'Förlorade spelet';
       case 0: return 'Vann spelet!';
       case 1: return this.figure1;
