@@ -2,17 +2,22 @@
   <div class="main-div">
     <h1>Hänga gubbe</h1>
     <div class="hangman">
-      {{ printOut }}
+      {{ hangmanFigure }}
+    </div>
+    <div>
+      <p>{{ word }}</p>
+      <p>Gissade bokstäver: {{ guessedLetters }}</p>
+      <p>Återstående gissningar: {{ remainingGuesses }}</p>
+      <p class="warning">{{ errorText }}</p>
     </div>
     <br />
     <div class="login-form">
-      <form class="form-group">
+      <form class="form-group" #f="ngForm" (ngSubmit)="makeAGuess(f)">
         <div>
-          <input type="text" class="form-control" name="guessChars" />
+          <input type="text" class="form-control" ngModel name="inputChars" required autocomplete="off" />
         </div>
         <div class="btn-group">
-          <button class="btn btn-primary" (click)="guessChar()">Gissa bokstav</button>
-          <button class="btn" (click)="guessWord()">Gissa ord</button>
+          <button type="submit" class="btn btn-primary">Gissa</button>
         </div>
       </form>
       <a routerLink="/games"><button class="btn">Tillbaka till spel</button></a>

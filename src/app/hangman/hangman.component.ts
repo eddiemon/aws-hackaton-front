@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { HangmanSession } from './hangman.session';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-game',
@@ -14,13 +15,13 @@ import { HangmanSession } from './hangman.session';
 export class HangmanComponent implements OnInit {
   readonly apiEndpoint = environment.API_ENDPOINT;
   readonly getGameStateApi = this.apiEndpoint + '/hangman-api/state';
-  readonly playCharApi = this.apiEndpoint + '/hangman-api/playchar';
+  readonly guessLetterApi = this.apiEndpoint + '/hangman-api/guessletter';
 
   readonly params = new HttpParams().append('username', this.auth.getAuthenticatedUser().getUsername());
 
-//#region Figures
+  //#region Figures
 
-figure1 = `  _______
+  figure1 = `  _______
  |/      |
  |
  |
@@ -29,7 +30,7 @@ figure1 = `  _______
  |
 _|___`;
 
-figure2 = `  _______
+  figure2 = `  _______
  |/      |
  |      (_)
  |
@@ -38,7 +39,7 @@ figure2 = `  _______
  |
 _|___`;
 
-figure3 = `  _______
+  figure3 = `  _______
  |/      |
  |      (_)
  |       |
@@ -47,7 +48,7 @@ figure3 = `  _______
  |
 _|___`;
 
-figure4 = `  _______
+  figure4 = `  _______
  |/      |
  |      (_)
  |       |
@@ -56,7 +57,7 @@ figure4 = `  _______
  |
 _|___`;
 
-figure5 = `  _______
+  figure5 = `  _______
  |/      |
  |      (_)
  |       |
@@ -65,7 +66,7 @@ figure5 = `  _______
  |
 _|___`;
 
-figure6 = `  _______
+  figure6 = `  _______
  |/      |
  |      (_)
  |      /|
@@ -74,7 +75,7 @@ figure6 = `  _______
  |
 _|___`;
 
-figure7 = `  _______
+  figure7 = `  _______
  |/      |
  |      (_)
  |      /|\\
@@ -83,10 +84,15 @@ figure7 = `  _______
  |
 _|___`;
 
-//#endregion
+  //#endregion
 
-  session: HangmanSession;
-  printOut: string = this.figure1;
+  hangmanFigure: string = this.figure1;
+  word: string;
+  guessedLetters: string;
+  remainingGuesses: string;
+  errorText: string;
+
+  lastSession: HangmanSession;
 
   constructor(
     private http: HttpClient,
@@ -101,7 +107,8 @@ _|___`;
       return;
     }
 
-    await this.updateSession();
+    const session = await this.getGameSession();
+    this.updateSession(session);
   }
 
   // Expect json of format
@@ -114,30 +121,72 @@ _|___`;
   // State -1 is lost game
   // State 1-7 is according to the different figures
   private async getGameSession(): Promise<HangmanSession> {
-
     const response = await this.http.get(this.getGameStateApi, { params: this.params }).toPromise();
 
     if (response === undefined ||
-        response['statusCode'] !== 200 ||
-        response['body'] === undefined) {
+      response['statusCode'] !== 200 ||
+      response['body'] === undefined) {
       console.log('Malformed response');
       return null;
     }
 
     const jsonResp = JSON.parse(response['body']);
-    return new HangmanSession(jsonResp.session.state, jsonResp.session.guessedLetters, jsonResp.session.remainingGuesses);
+    return this.sessionFromResponse(jsonResp);
   }
 
-  private async guessChar() {
-    await this.updateSession();
-  }
+  public async makeAGuess(form: NgForm) {
+    if (this.lastSession != null &&
+      (this.lastSession.State === 0 || this.lastSession.State === -1)) {
+      const session = await this.getGameSession();
+      this.updateSession(session);
+      return;
+    }
 
-  private async updateSession() {
-    this.session = await this.getGameSession();
-    if (this.session != null) {
-      this.printOut = this.stateToPrintOut(this.session.State);
+    const inputChars: string = form.value.inputChars.toLowerCase();
+    this.errorText = '';
+
+    if (inputChars.length === 0) {
+      this.errorText = 'Du kan inte gissa på ingenting..';
+    } else if (inputChars.length === 1) {
+      this.guessChar(inputChars);
     } else {
-      this.printOut = 'Något gick fel';
+      this.errorText = 'Inte implementerad';
+    }
+  }
+
+  private async guessChar(char: string) {
+    const response = await this.http.post(this.guessLetterApi, { letter: char }, { params: this.params }).toPromise();
+
+    if (response === undefined ||
+      response['statusCode'] !== 200 ||
+      response['body'] === undefined) {
+      console.log('Malformed response');
+      return;
+    }
+
+    const jsonResp = JSON.parse(response['body']);
+    const session = this.sessionFromResponse(jsonResp);
+    this.updateSession(session);
+  }
+
+  private sessionFromResponse(jsonResponse: any): HangmanSession {
+    return new HangmanSession(
+      jsonResponse.session.state,
+      jsonResponse.session.guessedLetters,
+      jsonResponse.session.remainingGuesses,
+      jsonResponse.session.maskedWord);
+  }
+
+  private updateSession(session: HangmanSession) {
+    if (session != null) {
+      this.word = session.Word;
+      this.remainingGuesses = session.RemainingGuesses.toString();
+      this.guessedLetters = session.GuessedLetters;
+      this.hangmanFigure = this.stateToPrintOut(session.State);
+
+      this.lastSession = session;
+    } else {
+      this.hangmanFigure = 'Något gick fel';
     }
   }
 
@@ -145,7 +194,7 @@ _|___`;
     switch (state) {
       case -2: return 'Något gick fel..';
       case -1: return 'Förlorade spelet';
-      case 0: return 'Vann spelet!';
+      case 0: return 'Du vann spelet! Trycka på Gissa en gång för att starta ett nytt';
       case 1: return this.figure1;
       case 2: return this.figure2;
       case 3: return this.figure3;
