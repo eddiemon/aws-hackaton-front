@@ -90,7 +90,7 @@ _|___`;
   word: string;
   guessedLetters: string;
   remainingGuesses: string;
-  errorText: string;
+  errorText: string = null;
 
   lastSession: HangmanSession;
 
@@ -108,42 +108,28 @@ _|___`;
     }
 
     const session = await this.getGameSession();
-    this.updateSession(session);
+    this.updatePresentation(session);
   }
 
-  // Expect json of format
-  // {
-  //   state: 1,
-  //   guessedLetters: "string",
-  //   remainingGuesses: 7
-  // }
-  // State 0 is won game
-  // State -1 is lost game
-  // State 1-7 is according to the different figures
-  private async getGameSession(): Promise<HangmanSession> {
-    const response = await this.http.get(this.getGameStateApi, { params: this.params }).toPromise();
-
-    if (response === undefined ||
-      response['statusCode'] !== 200 ||
-      response['body'] === undefined) {
-      console.log('Malformed response');
-      return null;
-    }
-
-    const jsonResp = JSON.parse(response['body']);
-    return this.sessionFromResponse(jsonResp);
-  }
-
+  // Called from HTML when user makes a guess on a letter
   public async makeAGuess(form: NgForm) {
+
     if (this.lastSession != null &&
       (this.lastSession.State === 0 || this.lastSession.State === -1)) {
+      // If the game never started, or game was lost/won, get a new session
       const session = await this.getGameSession();
-      this.updateSession(session);
+      this.updatePresentation(session);
+      return;
+    }
+
+    if (form.invalid) {
+      // Can only make a guess if form validates
       return;
     }
 
     const inputChars: string = form.value.inputChars.toLowerCase();
-    this.errorText = '';
+    form.resetForm();
+    this.errorText = null;
 
     if (inputChars.length === 0) {
       this.errorText = 'Du kan inte gissa på ingenting..';
@@ -154,6 +140,7 @@ _|___`;
     }
   }
 
+  // Sends a request to the 'guessLetterApi' and process the response
   private async guessChar(char: string) {
     const response = await this.http.post(this.guessLetterApi, { letter: char }, { params: this.params }).toPromise();
 
@@ -165,19 +152,46 @@ _|___`;
     }
 
     const jsonResp = JSON.parse(response['body']);
-    const session = this.sessionFromResponse(jsonResp);
-    this.updateSession(session);
+    const session = this.sessionFromResponse(jsonResp.session);
+    this.updatePresentation(session);
   }
 
-  private sessionFromResponse(jsonResponse: any): HangmanSession {
+  // Sends a request to the 'getGameStateApi' and returns the current session
+  private async getGameSession(): Promise<HangmanSession> {
+    const response = await this.http.get(this.getGameStateApi, { params: this.params }).toPromise();
+
+    if (response === undefined ||
+      response['statusCode'] !== 200 ||
+      response['body'] === undefined) {
+      console.log('Malformed response');
+      return null;
+    }
+
+    const jsonResp = JSON.parse(response['body']);
+    return this.sessionFromResponse(jsonResp.session);
+  }
+
+  // Converts a json object to a HangmanSession object
+  // Expects json of format
+  // {
+  //   state: 2,
+  //   guessedLetters: "zebla",
+  //   remainingGuesses: 6,
+  //   maskedWord: "zeb_a"
+  // }
+  // State 0 is won game
+  // State -1 is lost game
+  // State 1-7 is according to the different figures
+  private sessionFromResponse(json: any): HangmanSession {
     return new HangmanSession(
-      jsonResponse.session.state,
-      jsonResponse.session.guessedLetters,
-      jsonResponse.session.remainingGuesses,
-      jsonResponse.session.maskedWord);
+      json.state,
+      json.guessedLetters,
+      json.remainingGuesses,
+      json.maskedWord);
   }
 
-  private updateSession(session: HangmanSession) {
+  // Updates front-end from session data
+  private updatePresentation(session: HangmanSession) {
     if (session != null) {
       this.word = session.Word;
       this.remainingGuesses = session.RemainingGuesses.toString();
@@ -192,8 +206,7 @@ _|___`;
 
   private stateToPrintOut(state: number): string {
     switch (state) {
-      case -2: return 'Något gick fel..';
-      case -1: return 'Förlorade spelet';
+      case -1: return 'Du förlorade tyvärr spelet';
       case 0: return 'Du vann spelet! Trycka på Gissa en gång för att starta ett nytt';
       case 1: return this.figure1;
       case 2: return this.figure2;
@@ -202,6 +215,7 @@ _|___`;
       case 5: return this.figure5;
       case 6: return this.figure6;
       case 7: return this.figure7;
+      default: return 'Något gick fel..';
     }
   }
 }

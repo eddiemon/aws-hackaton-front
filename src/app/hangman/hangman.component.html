@@ -5,7 +5,7 @@
       {{ hangmanFigure }}
     </div>
     <div>
-      <p>{{ word }}</p>
+      <p style="letter-spacing: 1em; margin-top: 1em;">{{ word }}</p>
       <p>Gissade bokstäver: {{ guessedLetters }}</p>
       <p>Återstående gissningar: {{ remainingGuesses }}</p>
       <p class="warning">{{ errorText }}</p>
@@ -14,10 +14,11 @@
     <div class="login-form">
       <form class="form-group" #f="ngForm" (ngSubmit)="makeAGuess(f)">
         <div>
-          <input type="text" class="form-control" ngModel name="inputChars" required autocomplete="off" />
+          <label>Gissa på en bokstav i taget</label>
+          <input type="text" class="form-control" ngModel name="inputChars" minlength="1" maxlength="1" required autocomplete="off" />
         </div>
         <div class="btn-group">
-          <button type="submit" class="btn btn-primary">Gissa</button>
+          <input type="submit" class="btn btn-primary" style="margin-top: 1em; padding: 0 1em" value="Gissa" />
         </div>
       </form>
       <a routerLink="/games"><button class="btn">Tillbaka till spel</button></a>
